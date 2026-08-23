@@ -29,27 +29,31 @@ const SECRET = "your-secret-key";
 
 // Register route (create user with hashed password)
 app.post('/api/register', async (req, res) => {
-    const { username, password } = req.body;
-    if (!username || !password) {
-        return res.status(400).json({ success: false, message: "Missing fields" });
+  const { username, password, email, phone } = req.body;
+  if (!username || !password || !email || !phone) {
+    return res.status(400).json({ success: false, message: "Missing fields" });
+  }
+  try {
+    const hash = await bcrypt.hash(password, saltRounds);
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("username", sql.VarChar, username)
+      .input("password", sql.VarChar, hash)
+      .input("emailid", sql.VarChar, email)
+      .input("phonenumber", sql.VarChar, phone)
+      .query("INSERT INTO users (username, password, emailid, phonenumber) VALUES (@username, @password, @emailid, @phonenumber)");
+
+    res.json({ success: true, message: "User registered" });
+  } catch (err) {
+    console.error(err);
+    let msg = err.message;
+    if (msg.includes("UNIQUE") || msg.includes("duplicate")) {
+      msg = "Username already exists. Please choose another.";
     }
-    try {
-        const hash = await bcrypt.hash(password, saltRounds);
-        const pool = await sql.connect(dbConfig);
-        await pool.request()
-            .input("username", sql.VarChar, username)
-            .input("password", sql.VarChar, hash)
-            .query("INSERT INTO users (username, password) VALUES (@username, @password)");
-        res.json({ success: true, message: "User registered" });
-    } catch (err) {
-        console.error(err);
-        let msg = err.message;
-        if (msg.includes("UNIQUE") || msg.includes("duplicate")) {
-            msg = "Username already exists. Please choose another.";
-        }
-        res.status(500).json({ success: false, message: msg });
-    }
+    res.status(500).json({ success: false, message: msg });
+  }
 });
+
 
 // Login route (check hashed password and issue JWT)
 app.post('/api/login', async (req, res) => {
@@ -68,7 +72,7 @@ app.post('/api/login', async (req, res) => {
         const match = await bcrypt.compare(password, hash);
 
         if (match) {
-            const token = jwt.sign({ username }, SECRET, { expiresIn: "1h" });
+            const token = jwt.sign({ username }, SECRET, { expiresIn: "0.5h" });
             res.json({ success: true, token });
         } else {
             res.status(401).json({ success: false, message: "Invalid credentials" });
@@ -76,6 +80,53 @@ app.post('/api/login', async (req, res) => {
     } catch (err) {
         res.status(500).json({ success: false, message: err.message });
     }
+});
+// ---------------- PASSWORD RESET ----------------
+
+// Send OTP (for demo: just return OTP in response)
+app.post("/api/send-reset-otp", async (req, res) => {
+  const { username } = req.body;
+  if (!username) return res.status(400).json({ success: false, message: "Missing username" });
+
+  try {
+    const pool = await sql.connect(dbConfig);
+    const result = await pool.request()
+      .input("username", sql.VarChar, username)
+      .query("SELECT id FROM users WHERE username=@username");
+
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ success: false, message: "User not found" });
+    }
+
+    // Generate OTP (demo only)
+    const otp = Math.floor(100000 + Math.random() * 900000);
+
+    // For now, just return OTP in response (frontend will show popup)
+    res.json({ success: true, otp });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to generate OTP" });
+  }
+});
+
+// Reset password
+app.post("/api/reset-password", async (req, res) => {
+  const { username, newPassword } = req.body;
+  if (!username || !newPassword) {
+    return res.status(400).json({ success: false, message: "Missing fields" });
+  }
+
+  try {
+    const hash = await bcrypt.hash(newPassword, saltRounds);
+    const pool = await sql.connect(dbConfig);
+    await pool.request()
+      .input("username", sql.VarChar, username)
+      .input("password", sql.VarChar, hash)
+      .query("UPDATE users SET password=@password WHERE username=@username");
+
+    res.json({ success: true, message: "Password reset successful" });
+  } catch (err) {
+    res.status(500).json({ success: false, message: "Failed to reset password" });
+  }
 });
 
 // ---------------- DEVICES ----------------

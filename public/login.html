@@ -9,15 +9,10 @@
 
 <body class="bg-gray-50 dark:bg-gray-900">
   <section class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
-    <a
-      href="#"
-      class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white"
-    >
-      <img
-        class="w-8 h-8 mr-2"
+    <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+      <img class="w-8 h-8 mr-2"
         src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg"
-        alt="logo"
-      >
+        alt="logo">
       IoT Control
     </a>
 
@@ -30,160 +25,110 @@
         <!-- Login Form -->
         <form id="loginForm" class="space-y-4 md:space-y-6">
           <div>
-            <label
-              for="loginUsername"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Username
-            </label>
-
-            <input
-              type="text"
-              id="loginUsername"
-              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              required
-            >
+            <label for="loginUsername" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+            <input type="text" id="loginUsername" required
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
           </div>
 
           <div>
-            <label
-              for="loginPassword"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Password
-            </label>
-
-            <input type="password" id="loginPassword"
-              autocomplete="current-password"
-              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              required>
+            <label for="loginPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+            <input type="password" id="loginPassword" required autocomplete="current-password"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
           </div>
 
-          <button
-            type="submit"
-            class="w-full text-white bg-blue-600 hover:bg-blue-700 rounded-lg text-sm px-5 py-2.5 text-center"
-          >
+          <button type="submit"
+            class="w-full text-white bg-blue-600 hover:bg-blue-700 rounded-lg text-sm px-5 py-2.5 text-center">
             Sign in
           </button>
 
           <p class="text-sm font-light text-gray-500 dark:text-gray-400">
             Don’t have an account yet?
-            <a
-              href="#"
-              onclick="showRegister()"
-              class="font-medium text-blue-600 hover:underline"
-            >
-              Sign up
-            </a>
+            <a href="#" onclick="showRegister()" class="font-medium text-blue-600 hover:underline">Sign up</a>
           </p>
 
           <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-            <a
-              href="#"
-              onclick="showForgot()"
-              class="font-medium text-blue-600 hover:underline"
-            >
-              Forgot password?
-            </a>
+            <a href="#" onclick="showForgot()" class="font-medium text-blue-600 hover:underline">Forgot password?</a>
           </p>
         </form>
 
         <!-- Register Form -->
         <form id="registerForm" class="space-y-4 md:space-y-6 hidden">
-          <h2 class="text-xl font-bold text-gray-900 dark:text-white">
-            Register
-          </h2>
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white">Register</h2>
 
           <div>
-            <label
-              for="registerUsername"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Username
-            </label>
-
-            <input
-              type="text"
-              id="registerUsername"
-              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              required
-            >
+            <label for="registerUsername" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+            <input type="text" id="registerUsername" required
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
           </div>
 
           <div>
-            <label
-              for="registerPassword"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Password
-            </label>
-
-            <input type="password" id="registerPassword"
-              autocomplete="new-password"
-              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              required>
-
+            <label for="registerEmail" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Email</label>
+            <input type="email" id="registerEmail" required
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
           </div>
 
-          <button
-            type="submit"
-            class="w-full text-white bg-green-600 hover:bg-green-700 rounded-lg text-sm px-5 py-2.5 text-center"
-          >
+          <div>
+            <label for="registerPhone" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Phone</label>
+            <input type="tel" id="registerPhone" required
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+          </div>
+
+          <div>
+            <label for="registerPassword" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+            <input type="password" id="registerPassword" required autocomplete="new-password"
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+          </div>
+
+          <button type="submit"
+            class="w-full text-white bg-green-600 hover:bg-green-700 rounded-lg text-sm px-5 py-2.5 text-center">
             Register
           </button>
 
           <p class="text-sm font-light text-gray-500 dark:text-gray-400">
             Already have an account?
-            <a
-              href="#"
-              onclick="showLogin()"
-              class="font-medium text-blue-600 hover:underline"
-            >
-              Login
-            </a>
+            <a href="#" onclick="showLogin()" class="font-medium text-blue-600 hover:underline">Login</a>
           </p>
         </form>
 
         <!-- Forgot Password Form -->
         <form id="forgotForm" class="space-y-4 md:space-y-6 hidden">
-          <h2 class="text-xl font-bold text-gray-900 dark:text-white">
-            Forgot Password
-          </h2>
+          <h2 class="text-xl font-bold text-gray-900 dark:text-white">Forgot Password</h2>
 
           <div>
-            <label
-              for="forgotUsername"
-              class="block mb-2 text-sm font-medium text-gray-900 dark:text-white"
-            >
-              Username
-            </label>
-
-            <input
-              type="text"
-              id="forgotUsername"
-              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
-              required
-            >
+            <label for="forgotUsername" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Username</label>
+            <input type="text" id="forgotUsername" required
+              class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
           </div>
 
-          <button
-            type="submit"
-            class="w-full text-white bg-yellow-600 hover:bg-yellow-700 rounded-lg text-sm px-5 py-2.5 text-center"
-          >
+          <button type="submit"
+            class="w-full text-white bg-yellow-600 hover:bg-yellow-700 rounded-lg text-sm px-5 py-2.5 text-center">
             Reset Password
           </button>
 
           <p class="text-sm font-light text-gray-500 dark:text-gray-400">
-            Back to
-            <a
-              href="#"
-              onclick="showLogin()"
-              class="font-medium text-blue-600 hover:underline"
-            >
-              Login
-            </a>
+            Back to <a href="#" onclick="showLogin()" class="font-medium text-blue-600 hover:underline">Login</a>
           </p>
         </form>
+
+        <!-- Reset Section -->
+        <div id="resetSection" class="space-y-4 md:space-y-6 hidden">
+          <label for="resetOtp">Enter OTP</label>
+          <input type="text" id="resetOtp" required
+            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+
+          <label for="newPassword">New Password</label>
+          <input type="password" id="newPassword" required
+            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" required
+            class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:text-white">
+
+          <button type="button" onclick="resetPassword()"
+            class="w-full text-white bg-green-600 hover:bg-green-700 rounded-lg text-sm px-5 py-2.5 text-center">
+            Reset Password
+          </button>
+        </div>
 
         <div id="message" class="text-red-500 font-medium"></div>
       </div>
@@ -191,95 +136,140 @@
   </section>
 
   <script>
-    // Toggle forms
-    function showRegister() {
-      document.getElementById("loginForm").classList.add("hidden");
+  // Toggle forms
+  function showRegister() {
+    document.getElementById("loginForm").classList.add("hidden");
+    document.getElementById("forgotForm").classList.add("hidden");
+    document.getElementById("resetSection").classList.add("hidden");
+    document.getElementById("registerForm").classList.remove("hidden");
+  }
+
+  function showForgot() {
+    document.getElementById("loginForm").classList.add("hidden");
+    document.getElementById("registerForm").classList.add("hidden");
+    document.getElementById("resetSection").classList.add("hidden");
+    document.getElementById("forgotForm").classList.remove("hidden");
+  }
+
+  function showLogin() {
+    document.getElementById("registerForm").classList.add("hidden");
+    document.getElementById("forgotForm").classList.add("hidden");
+    document.getElementById("resetSection").classList.add("hidden");
+    document.getElementById("loginForm").classList.remove("hidden");
+  }
+
+  // Login
+  document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const username = document.getElementById("loginUsername").value;
+    const password = document.getElementById("loginPassword").value;
+
+    const res = await fetch("/api/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      sessionStorage.setItem("token", data.token);
+      window.location.href = "device.html";
+    } else {
+      document.getElementById("message").innerText = data.message || "Login failed";
+    }
+  });
+
+  // Register
+  document.getElementById("registerForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById("registerUsername").value;
+    const password = document.getElementById("registerPassword").value;
+    const email = document.getElementById("registerEmail").value;
+    const phone = document.getElementById("registerPhone").value;
+
+    const res = await fetch("/api/register", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, password, email, phone })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      sessionStorage.setItem("token", data.token);
+      window.location.href = "device.html";
+    } else {
+      document.getElementById("message").innerText = data.message || "Registration failed";
+    }
+  });
+
+  // Forgot Password
+  document.getElementById("forgotForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const username = document.getElementById("forgotUsername").value;
+
+    const res = await fetch("/api/send-reset-otp", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      // Show OTP popup
+      alert("Your OTP is: " + data.otp);
+
+      // Save OTP and username in sessionStorage
+      sessionStorage.setItem("resetOtp", data.otp);
+      sessionStorage.setItem("resetUser", username);
+
+      // Show reset section
+      document.getElementById("resetSection").classList.remove("hidden");
       document.getElementById("forgotForm").classList.add("hidden");
-      document.getElementById("registerForm").classList.remove("hidden");
+    } else {
+      document.getElementById("message").innerText = data.message || "Failed to generate OTP";
+    }
+  });
+
+  // Reset Password
+  function resetPassword() {
+    const enteredOtp = document.getElementById("resetOtp").value;
+    const savedOtp = sessionStorage.getItem("resetOtp");
+    const username = sessionStorage.getItem("resetUser");
+    const newPassword = document.getElementById("newPassword").value;
+    const confirmPassword = document.getElementById("confirmPassword").value;
+
+    if (enteredOtp !== savedOtp) {
+      document.getElementById("message").innerText = "Invalid OTP!";
+      return;
     }
 
-    function showForgot() {
-      document.getElementById("loginForm").classList.add("hidden");
-      document.getElementById("registerForm").classList.add("hidden");
-      document.getElementById("forgotForm").classList.remove("hidden");
+    if (newPassword !== confirmPassword) {
+      document.getElementById("message").innerText = "Passwords do not match!";
+      return;
     }
 
-    function showLogin() {
-      document.getElementById("registerForm").classList.add("hidden");
-      document.getElementById("forgotForm").classList.add("hidden");
-      document.getElementById("loginForm").classList.remove("hidden");
-    }
-
-    // Login
-    document.getElementById("loginForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const username = document.getElementById("loginUsername").value;
-      const password = document.getElementById("loginPassword").value;
-
-      const res = await fetch("/api/login", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          username,
-          password
-        })
+    fetch("/api/reset-password", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ username, newPassword })
+    })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) {
+          document.getElementById("message").innerText = "Password reset successful!";
+          showLogin();
+        } else {
+          document.getElementById("message").innerText = data.message || "Reset failed";
+        }
       });
+  }
+</script>
 
-      const data = await res.json();
-
-      if (data.success) {
-        console.log("Received token:", data.token); // Debug log
-        sessionStorage.setItem("token", data.token);
-        window.location.href = "device.html";
-      } else {
-        document.getElementById("message").innerText =
-          data.message || "Login failed";
-      }
-    });
-
-    // Register
-    document.getElementById("registerForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const username = document.getElementById("registerUsername").value;
-      const password = document.getElementById("registerPassword").value;
-
-      const res = await fetch("/api/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({
-          username,
-          password
-        })
-      });
-
-      const data = await res.json();
-
-      if (data.success) {
-        // Save JWT only for this browser session
-        sessionStorage.setItem("token", data.token);
-        window.location.href = "device.html";
-      } else {
-        document.getElementById("message").innerText =
-          data.message || "Login failed";
-      }
-    });
-
-    // Forgot Password (placeholder)
-    document.getElementById("forgotForm").addEventListener("submit", async (e) => {
-      e.preventDefault();
-
-      const username = document.getElementById("forgotUsername").value;
-
-      document.getElementById("message").innerText =
-        "Password reset flow not yet implemented for user: " + username;
-    });
-  </script>
 </body>
 
 </html>
