@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>ESP32 LED Control</title>
+</head>
+<body>
+  <h2>ESP32 LED Control</h2>
+
+  <!-- Input for device ID -->
+  <label for="device_id">Device ID:</label>
+  <input type="text" id="device_id" placeholder="ESP32_LAB_01" />
+
+  <!-- Buttons for actions -->
+  <button onclick="sendCommand('ON')">Turn ON</button>
+  <button onclick="sendCommand('OFF')">Turn OFF</button>
+
+  <h3>Status</h3>
+  <div id="status">Loading...</div>
+
+  <script>
+    async function sendCommand(action) {
+      const device_id = document.getElementById('device_id').value || 'ESP32_LAB_01';
+      const res = await fetch('/api/device/control', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ device_id, status: action })
+      });
+      const data = await res.json();
+      alert("Command sent: " + action + " to " + device_id);
+    }
+
+    async function refreshStatus() {
+      const res = await fetch('/api/device/status');
+      const data = await res.json();
+      document.getElementById('status').innerText = JSON.stringify(data);
+    }
+
+    setInterval(refreshStatus, 5000); // refresh every 5s
+    refreshStatus();
+  </script>
+</body>
+</html>
