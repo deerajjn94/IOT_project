@@ -76,8 +76,15 @@
     .device-icon {
       width: 38px;
       height: 38px;
+      padding: 0;
+      border: 0;
       border-radius: 10px;
       font-size: 20px;
+      cursor: pointer;
+    }
+
+    .device-icon:hover {
+      filter: brightness(0.95);
     }
 
     .eyebrow {
@@ -171,12 +178,18 @@
       font: inherit;
     }
 
-    .device-field select:focus {
+    .device-field select:focus,
+    .pin-name-input:focus {
       border-color: var(--blue);
       box-shadow: 0 0 0 3px rgba(22, 142, 234, 0.12);
     }
 
-    .edit-all-button {
+    .pin-actions {
+      display: flex;
+      gap: 8px;
+    }
+
+    .action-button {
       padding: 12px 18px;
       color: white;
       border: 0;
@@ -187,8 +200,19 @@
       white-space: nowrap;
     }
 
-    .edit-all-button:hover {
+    .action-button:hover {
       filter: brightness(0.95);
+    }
+
+    .action-button.secondary {
+      color: #41586a;
+      border: 1px solid #cbdce7;
+      background: #f8fbfd;
+    }
+
+    .action-button.secondary:hover {
+      background: #eef5f9;
+      filter: none;
     }
 
     .switch-grid {
@@ -214,6 +238,27 @@
       color: #41586a;
       font-size: 12px;
       font-weight: bold;
+    }
+
+    .pin-name-input {
+      width: 100%;
+      min-width: 0;
+      padding: 8px 9px;
+      color: var(--text);
+      border: 1px solid #cbdce7;
+      border-radius: 7px;
+      outline: none;
+      background: white;
+      font: inherit;
+      font-size: 12px;
+    }
+
+    .pin-name-input:disabled {
+      padding: 0;
+      color: #41586a;
+      border-color: transparent;
+      background: transparent;
+      cursor: default;
     }
 
     .switch {
@@ -290,8 +335,12 @@
         flex-direction: column;
       }
 
-      .edit-all-button {
+      .pin-actions {
         width: 100%;
+      }
+
+      .action-button {
+        flex: 1;
       }
 
       .switch-grid {
@@ -324,7 +373,15 @@
           <p class="eyebrow">DEVICE MANAGEMENT</p>
           <h2 id="control-title">Pin Configuration</h2>
         </div>
-        <div class="device-icon" aria-hidden="true">⌂</div>
+
+        <button
+          class="device-icon"
+          type="button"
+          aria-label="Go to devices"
+          onclick="window.location.href='device.html'"
+        >
+          ⌂
+        </button>
       </div>
 
       <div class="device-selection">
@@ -333,9 +390,29 @@
           <select id="deviceDropdown"></select>
         </div>
 
-        <button id="editPinsButton" class="edit-all-button" type="button">
-          Edit Pins
-        </button>
+        <div class="pin-actions">
+          <button id="editPinsButton" class="action-button" type="button">
+            Edit
+          </button>
+
+          <button
+            id="savePinsButton"
+            class="action-button"
+            type="button"
+            hidden
+          >
+            Save
+          </button>
+
+          <button
+            id="cancelPinsButton"
+            class="action-button secondary"
+            type="button"
+            hidden
+          >
+            Cancel
+          </button>
+        </div>
       </div>
 
       <div class="switch-grid" id="switchGrid"></div>
@@ -354,6 +431,8 @@
   <script>
     const deviceControls = [];
     let pins = [];
+    let originalPinNames = [];
+    let isEditing = false;
     let apiErrorShown = false;
 
     function getToken() {
@@ -430,68 +509,111 @@
         }
 
         pins = data.pins || [];
-
-        const switchGrid = document.getElementById("switchGrid");
-        switchGrid.innerHTML = "";
-        deviceControls.length = 0;
-
-        pins.forEach((pin) => {
-          const pinKey = "pin" + pin.pin_number;
-
-          const control = document.createElement("div");
-          control.className = "device-control";
-          control.dataset.pin = pinKey;
-
-          control.innerHTML = `
-            <label class="switch" aria-label="${escapeHtml(pin.pin_name)}">
-              <input type="checkbox" disabled>
-              <span class="slider"></span>
-            </label>
-
-            <div>
-              <p class="pin-number">Pin ${escapeHtml(pin.pin_number)}</p>
-              <p class="device-name">${escapeHtml(pin.pin_name)}</p>
-            </div>
-          `;
-
-          switchGrid.appendChild(control);
-          deviceControls.push(control);
-        });
-
+        renderPins();
+        setEditMode(false);
         clearApiError();
       } catch (error) {
         showApiError(error);
       }
     }
 
-    async function editAllPinNames() {
-      if (!pins.length) {
+    function renderPins() {
+      const switchGrid = document.getElementById("switchGrid");
+      switchGrid.innerHTML = "";
+      deviceControls.length = 0;
+
+      pins.forEach((pin) => {
+        const control = document.createElement("div");
+        control.className = "device-control";
+        control.dataset.pin = "pin" + pin.pin_number;
+
+        control.innerHTML = `
+          <label class="switch" aria-label="${escapeHtml(pin.pin_name)}">
+            <input type="checkbox" disabled>
+            <span class="slider"></span>
+          </label>
+
+          <div>
+            <p class="pin-number">Pin ${escapeHtml(pin.pin_number)}</p>
+            <input
+              class="pin-name-input"
+              type="text"
+              value="${escapeHtml(pin.pin_name)}"
+              aria-label="Name for pin ${escapeHtml(pin.pin_number)}"
+              disabled
+            >
+          </div>
+        `;
+
+        switchGrid.appendChild(control);
+        deviceControls.push(control);
+      });
+    }
+
+    function setEditMode(enabled) {
+      isEditing = enabled;
+
+      document.getElementById("editPinsButton").hidden = enabled;
+      document.getElementById("savePinsButton").hidden = !enabled;
+      document.getElementById("cancelPinsButton").hidden = !enabled;
+      document.getElementById("deviceDropdown").disabled = enabled;
+
+      document.querySelectorAll(".pin-name-input").forEach((input) => {
+        input.disabled = !enabled;
+      });
+    }
+
+    function startEditing() {
+      originalPinNames = pins.map((pin) => pin.pin_name);
+      setEditMode(true);
+    }
+
+    function cancelEditing() {
+      pins.forEach((pin, index) => {
+        pin.pin_name = originalPinNames[index];
+      });
+
+      renderPins();
+      setEditMode(false);
+      clearApiError();
+    }
+
+    async function savePinNames() {
+      const inputs = document.querySelectorAll(".pin-name-input");
+      const changedPins = [];
+      const deviceId = document.getElementById("deviceDropdown").value;
+
+      if (!deviceId) {
         return;
       }
 
-      for (const pin of pins) {
-        const newName = prompt(
-          "Enter a new name for pin " + pin.pin_number,
-          pin.pin_name
-        );
 
-        if (newName === null) {
-          continue;
+      inputs.forEach((input, index) => {
+        const newName = input.value.trim();
+
+        if (!newName) {
+          return;
         }
 
-        const trimmedName = newName.trim();
-
-        if (!trimmedName || trimmedName === pin.pin_name) {
-          continue;
+        if (newName !== pins[index].pin_name) {
+          changedPins.push({
+            pin: pins[index],
+            newName
+          });
         }
+      });
 
-        try {
-          const res = await fetch("/api/updatePinName", {
+      
+      try {
+        for (const item of changedPins) {
+          const res = await fetch(
+          `/api/updatePinName?device_id=${encodeURIComponent(deviceId)}`, 
+          {
             method: "POST",
             headers: authHeaders(true),
             body: JSON.stringify({
-              pin_number: pin.pin_number,
-              new_name: trimmedName
+              pin_number: item.pin.pin_number,
+              new_name: item.newName
             })
           });
 
@@ -499,19 +621,19 @@
 
           if (!res.ok || !data.success) {
             throw new Error(
-              data.message || `Unable to update pin ${pin.pin_number}`
+              data.message || `Unable to update pin ${item.pin.pin_number}`
             );
           }
 
-          pin.pin_name = trimmedName;
-        } catch (error) {
-          showApiError(error);
-          return;
+          item.pin.pin_name = item.newName;
         }
-      }
 
-      await loadPinNames();
-      clearApiError();
+        renderPins();
+        setEditMode(false);
+        clearApiError();
+      } catch (error) {
+        showApiError(error);
+      }
     }
 
     function escapeHtml(value) {
@@ -537,7 +659,15 @@
     document.addEventListener("DOMContentLoaded", () => {
       document
         .getElementById("editPinsButton")
-        .addEventListener("click", editAllPinNames);
+        .addEventListener("click", startEditing);
+
+      document
+        .getElementById("savePinsButton")
+        .addEventListener("click", savePinNames);
+
+      document
+        .getElementById("cancelPinsButton")
+        .addEventListener("click", cancelEditing);
 
       document
         .getElementById("deviceDropdown")

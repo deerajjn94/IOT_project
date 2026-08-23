@@ -172,10 +172,11 @@ app.post("/api/updatePinName", async (req, res) => {
     if (userResult.recordset.length === 0) return res.status(404).json({ success: false });
 
     const userid = userResult.recordset[0].id;
+    const deviceId = req.query.device_id;
 
     await pool.request()
       .input("userid", sql.Int, userid)
-      .input("device_id", sql.VarChar, device_id)
+      .input("device_id", sql.VarChar, deviceId)
       .input("pin_name", sql.VarChar, new_name)
       .query(`UPDATE user_device_pins SET pin${pin_number}_name=@pin_name WHERE userid=@userid AND device_id=@device_id`);
 
