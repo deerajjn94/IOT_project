@@ -1,5 +1,4 @@
 import subprocess
-import os
 
 def run_git_command(cmd):
     """Run a git command and return output."""
@@ -28,12 +27,11 @@ def main():
         if file_path.startswith("public/"):
             public_changes.append(file_path)
         else:
-            # only top-level files (no slash) are considered root
-            if "/" not in file_path:
+            if "/" not in file_path:  # only top-level files
                 root_changes.append(file_path)
 
     # Step 4: Build commit message
-    commit_msg = "Auto-update:\n"
+    commit_msg = "Auto-update (dev branch):\n"
     if root_changes:
         commit_msg += f"Root folder changes: {', '.join(root_changes)}\n"
     if public_changes:
@@ -42,10 +40,10 @@ def main():
     # Step 5: Commit
     run_git_command(["git", "commit", "-m", commit_msg])
 
-    # Step 6: Push
-    run_git_command(["git", "push", "origin", "main"])
+    # Step 6: Push to dev branch
+    run_git_command(["git", "push", "origin", "dev"])
 
-    print("Changes committed and pushed successfully!")
+    print("Changes committed and pushed to dev branch successfully!")
 
 if __name__ == "__main__":
     main()
