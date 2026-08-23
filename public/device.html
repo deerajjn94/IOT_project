@@ -142,10 +142,17 @@
     }
 
     .device-selection {
+      display: flex;
+      align-items: end;
+      gap: 12px;
       margin-top: 22px;
     }
 
-    .device-selection label {
+    .device-field {
+      flex: 1;
+    }
+
+    .device-field label {
       display: block;
       margin-bottom: 8px;
       color: #41586a;
@@ -153,7 +160,7 @@
       font-weight: bold;
     }
 
-    .device-selection select {
+    .device-field select {
       width: 100%;
       padding: 13px 14px;
       color: var(--text);
@@ -164,9 +171,24 @@
       font: inherit;
     }
 
-    .device-selection select:focus {
+    .device-field select:focus {
       border-color: var(--blue);
       box-shadow: 0 0 0 3px rgba(22, 142, 234, 0.12);
+    }
+
+    .config-button {
+      padding: 12px 18px;
+      color: white;
+      border: 0;
+      border-radius: 10px;
+      background: linear-gradient(145deg, var(--blue), var(--blue-dark));
+      font-weight: bold;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .config-button:hover {
+      filter: brightness(0.95);
     }
 
     .switch-grid {
@@ -272,7 +294,9 @@
     .status-led[data-state="ON"] {
       border-color: #16a34a;
       background: #22c55e;
-      box-shadow: 0 0 6px #22c55e, 0 0 14px rgba(34, 197, 94, 0.85);
+      box-shadow:
+        0 0 6px #22c55e,
+        0 0 14px rgba(34, 197, 94, 0.85);
     }
 
     .current-status {
@@ -292,14 +316,6 @@
       color: #16a34a;
       border-color: rgba(22, 163, 74, 0.25);
       background: rgba(220, 252, 231, 0.75);
-    }
-
-    .edit-pin {
-      padding: 5px 8px;
-      border: 1px solid #cbdce7;
-      border-radius: 6px;
-      background: white;
-      cursor: pointer;
     }
 
     .switch-hint {
@@ -330,6 +346,15 @@
 
       .control-card {
         padding: 18px;
+      }
+
+      .device-selection {
+        align-items: stretch;
+        flex-direction: column;
+      }
+
+      .config-button {
+        width: 100%;
       }
 
       .switch-grid {
@@ -366,8 +391,14 @@
       </div>
 
       <div class="device-selection">
-        <label for="deviceDropdown">Select the device</label>
-        <select id="deviceDropdown"></select>
+        <div class="device-field">
+          <label for="deviceDropdown">Select the device</label>
+          <select id="deviceDropdown"></select>
+        </div>
+
+        <button id="configButton" class="config-button" type="button">
+          Device Configuration
+        </button>
       </div>
 
       <div class="switch-grid" id="switchGrid"></div>
@@ -488,7 +519,6 @@
                   data-state="OFF"
                   role="status"
                   aria-live="polite">OFF</span>
-                <button class="edit-pin" type="button">Edit</button>
               </div>
             </div>
           `;
@@ -506,46 +536,9 @@
               sendPinChange(control);
             }
           });
-
-          control.querySelector(".edit-pin").addEventListener("click", () => {
-            editPinName(pin.pin_number, pin.pin_name);
-          });
         });
 
         await refreshStatuses();
-      } catch (error) {
-        showApiError(error);
-      }
-    }
-
-    async function editPinName(pinNumber, oldName) {
-      const newName = prompt(
-        "Enter new name for pin " + pinNumber,
-        oldName
-      );
-
-      if (!newName || newName.trim() === oldName) {
-        return;
-      }
-
-      try {
-        const res = await fetch("/api/updatePinName", {
-          method: "POST",
-          headers: authHeaders(true),
-          body: JSON.stringify({
-            pin_number: pinNumber,
-            new_name: newName.trim()
-          })
-        });
-
-        const data = await res.json();
-
-        if (!res.ok || !data.success) {
-          throw new Error(data.message || "Unable to update pin name");
-        }
-
-        await loadPinNames();
-        clearApiError();
       } catch (error) {
         showApiError(error);
       }
@@ -608,10 +601,6 @@
           throw new Error(data.message || "Device control request failed");
         }
 
-        /*
-         * Do not update the switch from the click.
-         * Read the confirmed state from the status endpoint instead.
-         */
         await refreshStatuses();
         clearApiError();
       } catch (error) {
@@ -683,6 +672,12 @@
         .addEventListener("change", async () => {
           await loadPinNames();
           await refreshStatuses();
+        });
+
+      document
+        .getElementById("configButton")
+        .addEventListener("click", () => {
+          window.location.href = "device_config.html";
         });
 
       await loadDevices();
