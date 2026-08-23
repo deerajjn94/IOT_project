@@ -31,7 +31,7 @@ def main():
                 root_changes.append(file_path)
 
     # Step 4: Build commit message
-    commit_msg = "Auto-update (Dev branch):\n"
+    commit_msg = "Auto-update (dev branch):\n"
     if root_changes:
         commit_msg += f"Root folder changes: {', '.join(root_changes)}\n"
     if public_changes:
@@ -41,9 +41,9 @@ def main():
     run_git_command(["git", "commit", "-m", commit_msg])
 
     # Step 6: Push to dev branch
-    run_git_command(["git", "push", "origin", "Dev"])
+    run_git_command(["git", "push", "origin", "dev"])
 
-    print("Changes committed and pushed to Dev branch successfully!")
+    print("Changes committed and pushed to dev branch successfully!")
 
 if __name__ == "__main__":
     main()
