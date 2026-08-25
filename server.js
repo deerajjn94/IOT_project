@@ -1,5 +1,6 @@
 const express = require('express');
-const sql = require('mssql');
+const sql = require('mssql');               // for primary (TCP/IP + SQL Auth)
+const sqlv8 = require('mssql/msnodesqlv8'); // for backup (Windows Auth)
 const bodyParser = require('body-parser');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
@@ -9,18 +10,67 @@ const app = express();
 app.use(bodyParser.json());
 app.use(session({ secret: 'iot_secret', resave: false, saveUninitialized: true }));
 
-// SQL Server config
 const dbConfig = {
-    server: "DESKTOP-R87H1QS\\SQLEXPRESS",
-    database: "iot_db",
-    user: "sa",
-    password: "Medilla18@",
-    options: { 
-        encrypt: false, 
-        trustServerCertificate: true,
-        port: 1433
-     }
+  server: "DESKTOP-R87H1QS\\SQLEXPRESS",
+  database: "iot_db",
+  user: "sa",
+  password: "Medilla18@",
+  options: { 
+    encrypt: false,
+    trustServerCertificate: true,
+    port: 1433,
+    connectionTimeout: 3000,   // fail after 3s
+    requestTimeout: 5000       // query timeout
+  },
+  pool: {
+    idleTimeoutMillis: 3000,   // close idle connections quickly
+    acquireTimeoutMillis: 3000 // fail fast if pool can't connect
+  }
 };
+
+
+const dbConfig1 = {
+  server: 'localhost\\SQLEXPRESS',
+  database: 'iot_db',
+  driver: 'msnodesqlv8',
+  options: {
+    trustedConnection: true
+  }
+};
+
+let dbPoolPromise;
+
+async function tryPrimary() {
+  return Promise.race([
+    new sql.ConnectionPool(dbConfig).connect(),
+    new Promise((_, reject) => setTimeout(() => reject(new Error("Primary timed out")), 3000))
+  ]);
+}
+
+async function getDbPool() {
+  if (dbPoolPromise) return dbPoolPromise;
+
+  try {
+    const pool = await tryPrimary();
+    console.log("Connected to primary database (SQL Auth)");
+    return pool;
+  } catch (primaryError) {
+    console.error("Primary database connection failed quickly:", primaryError.message);
+
+    try {
+      const pool = await new sqlv8.ConnectionPool(dbConfig1).connect();
+      console.log("Connected to backup database (Windows Auth)");
+      return pool;
+    } catch (backupError) {
+      console.error("Backup database connection failed:", backupError.message);
+      dbPoolPromise = undefined;
+      throw new Error("Could not connect to either database");
+    }
+  }
+}
+
+
+
 
 const saltRounds = 10;
 const SECRET = "your-secret-key";
@@ -35,7 +85,7 @@ app.post('/api/register', async (req, res) => {
   }
   try {
     const hash = await bcrypt.hash(password, saltRounds);
-    const pool = await sql.connect(dbConfig);
+    const pool = await getDbPool();
     await pool.request()
       .input("username", sql.VarChar, username)
       .input("password", sql.VarChar, hash)
@@ -59,7 +109,7 @@ app.post('/api/register', async (req, res) => {
 app.post('/api/login', async (req, res) => {
     const { username, password } = req.body;
     try {
-        const pool = await sql.connect(dbConfig);
+        const pool = await getDbPool();
         const result = await pool.request()
             .input("username", sql.VarChar, username)
             .query("SELECT id, password FROM users WHERE username=@username");
@@ -89,7 +139,7 @@ app.post("/api/send-reset-otp", async (req, res) => {
   if (!username) return res.status(400).json({ success: false, message: "Missing username" });
 
   try {
-    const pool = await sql.connect(dbConfig);
+    const pool = await getDbPool();
     const result = await pool.request()
       .input("username", sql.VarChar, username)
       .query("SELECT id FROM users WHERE username=@username");
@@ -117,7 +167,7 @@ app.post("/api/reset-password", async (req, res) => {
 
   try {
     const hash = await bcrypt.hash(newPassword, saltRounds);
-    const pool = await sql.connect(dbConfig);
+    const pool = await getDbPool();
     await pool.request()
       .input("username", sql.VarChar, username)
       .input("password", sql.VarChar, hash)
@@ -141,7 +191,7 @@ app.get("/api/devices", async (req, res) => {
     const decoded = jwt.verify(token, SECRET);
     const username = decoded.username;
 
-    const pool = await sql.connect(dbConfig);
+    const pool = await getDbPool();
     const userResult = await pool.request()
       .input("username", sql.VarChar, username)
       .query("SELECT id FROM users WHERE username=@username");
@@ -172,7 +222,7 @@ app.get("/api/pinNames", async (req, res) => {
     const decoded = jwt.verify(token, SECRET);
     const username = decoded.username;
 
-    const pool = await sql.connect(dbConfig);
+    const pool = await getDbPool();
     const userResult = await pool.request()
       .input("username", sql.VarChar, username)
       .query("SELECT id FROM users WHERE username=@username");
@@ -215,7 +265,7 @@ app.post("/api/updatePinName", async (req, res) => {
     const decoded = jwt.verify(token, SECRET);
     const username = decoded.username;
 
-    const pool = await sql.connect(dbConfig);
+    const pool = await getDbPool();
     const userResult = await pool.request()
       .input("username", sql.VarChar, username)
       .query("SELECT id FROM users WHERE username=@username");
@@ -243,7 +293,7 @@ app.post("/api/updatePinName", async (req, res) => {
 app.post('/api/device/control', async (req, res) => {
   const { device_id, pins } = req.body; 
   try {
-    const pool = await sql.connect(dbConfig);
+    const pool = await getDbPool();
 
     await pool.request()
       .input("device_id", sql.VarChar, device_id)
@@ -274,7 +324,7 @@ app.post('/api/device/control', async (req, res) => {
 app.get("/api/device/status", async (req, res) => {
   const { device_id } = req.query;
   try {
-    const pool = await sql.connect(dbConfig);
+    const pool = await getDbPool();
     const result = await pool.request()
       .input("device_id", sql.VarChar, device_id)
       .query("SELECT TOP 1 pin1, pin2, pin3, pin4, pin5, pin6, pin7, pin8, pin9, pin10 FROM device_commands WHERE device_id=@device_id ORDER BY timestamp DESC");
