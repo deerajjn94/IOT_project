@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rocker Switch</title>
+
+<style>
+  body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background: #f5f5f5;
+    font-family: sans-serif;
+  }
+
+  .switch-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 22px;
+  }
+
+  .switch-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .switch-content label {
+    color: #222;
+    font-size: 18px;
+    font-weight: 600;
+  }
+
+  .switch-status {
+    min-width: 70px;
+    color: #2a1a12;
+    font-size: 18px;
+    font-weight: 700;
+    text-align: center;
+  }
+
+  .rocker-input {
+    position: absolute;
+    width: 0;
+    height: 0;
+    opacity: 0;
+  }
+
+  .rocker-switch {
+    position: relative;
+    width: 70px;
+    height: 120px;
+    cursor: pointer;
+    perspective: 300px;
+  }
+
+  .rocker-lever {
+    position: absolute;
+    inset: 0;
+    border: 2px solid #2a1a12;
+    border-radius: 12px;
+    background: linear-gradient(
+      to bottom,
+      #3d2518 0%,
+      #7a3220 40%,
+      #c44a22 70%,
+      #e05a2b 100%
+    );
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.35),
+      inset 0 1px 1px rgba(255, 255, 255, 0.15);
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease,
+      background 0.4s ease;
+    transform-origin: center center;
+
+    /* OFF angle */
+    transform: rotateX(12deg);
+  }
+
+  /* ON: orange-red on top, dark at the bottom */
+  .rocker-input:checked + .rocker-switch .rocker-lever {
+    background: linear-gradient(
+      to bottom,
+      #e05a2b 0%,
+      #c44a22 30%,
+      #7a3220 60%,
+      #3d2518 100%
+    );
+    box-shadow:
+      0 -4px 14px rgba(0, 0, 0, 0.25),
+      0 8px 20px rgba(224, 90, 43, 0.2),
+      inset 0 1px 1px rgba(255, 255, 255, 0.2);
+
+    /* ON angle */
+    transform: rotateX(-12deg);
+  }
+
+  .rocker-lever::before,
+  .rocker-lever::after {
+    position: absolute;
+    left: 50%;
+    width: 30px;
+    height: 3px;
+    border-radius: 2px;
+    content: "";
+    transform: translateX(-50%);
+  }
+
+  .rocker-lever::before {
+    top: 6px;
+    background: rgba(255, 255, 255, 0.25);
+  }
+
+  .rocker-lever::after {
+    bottom: 6px;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  @media (max-width: 420px) {
+    .switch-wrapper {
+      gap: 14px;
+    }
+
+    .switch-status {
+      min-width: 55px;
+      font-size: 16px;
+    }
+  }
+</style>
+</head>
+
+<body>
+  <div class="switch-wrapper">
+    <div class="switch-content">
+      <input
+        type="checkbox"
+        id="switch1"
+        class="rocker-input"
+        checked
+        onchange="updateStatus(this)"
+      >
+
+      <label class="rocker-switch" for="switch1">
+        <span class="rocker-lever"></span>
+      </label>
+
+      <label for="switch1">Device switch</label>
+    </div>
+
+    <span id="switchStatus" class="switch-status">ON</span>
+  </div>
+
+  <script>
+    function updateStatus(input) {
+      document.getElementById("switchStatus").textContent =
+        input.checked ? "ON" : "OFF";
+    }
+  </script>
+</body>
+</html>
