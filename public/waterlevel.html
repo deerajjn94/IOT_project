@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Animated Water Tank</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #11afff;
+            font-family: Arial, sans-serif;
+        }
+
+        .tank-wrapper {
+            width: 300px;
+        }
+
+        .tank {
+            position: relative;
+            width: 300px;
+            height: 400px;
+            overflow: hidden;
+            border: 6px solid #90a4ae;
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0);
+            
+        }
+
+        .water {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: var(--water-level, 50%);
+            background: #3586ff;
+            transition: height 0.2s ease-in-out;
+        }
+
+        .waves {
+            position: absolute;
+            top: -30px;
+            left: 0;
+            width: 100%;
+            height: 800px;
+        }
+
+        .wave {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100px;
+            background-image: url("wave.png");
+            background-repeat: repeat-x;
+            background-size: 1000px 30px;
+        }
+
+        #wave1 {
+            z-index: 4;
+            opacity: 1;
+            animation: animate 2s linear infinite;
+        }
+
+        #wave2 {
+            z-index: 3;
+            opacity: 0.5;
+            top: 1px;
+            animation: animate2 2s linear infinite;
+        }
+
+        #wave3 {
+            z-index: 2;
+            opacity: 0.7;
+            top: 1px;
+            animation: animate 2s linear infinite;
+        }
+
+        #wave4 {
+            z-index: 1;
+            opacity: 0.7;
+            top: 1px;
+            animation: animate2 1s linear infinite;
+        }
+
+        @keyframes animate {
+            from {
+                background-position: 1000px 0;
+            }
+
+            to {
+                background-position: 0 0;
+            }
+        }
+
+        @keyframes animate2 {
+            from {
+                background-position: 0 0;
+            }
+
+            to {
+                background-position: 1000px 0;
+            }
+        }
+
+        .level-label {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 32px;
+            font-weight: bold;
+            text-shadow: 0 2px 5px #000;
+            pointer-events: none;
+        }
+
+        .controls {
+            margin-top: 22px;
+            width: 100%;
+            color: white;
+            text-align: center;
+        }
+
+        .controls label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #3586ff;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="tank-wrapper">
+        <div class="tank">
+            <div class="water" id="water">
+                <div class="waves">
+                    <div class="wave" id="wave1"></div>
+                    <div class="wave" id="wave2"></div>
+                    <div class="wave" id="wave3"></div>
+                    <div class="wave" id="wave4"></div>
+                </div>
+            </div>
+
+            <div class="level-label" id="levelLabel">50%</div>
+        </div>
+
+        <div class="controls">
+            <label for="levelInput">
+                Water Level: <span id="sliderValue">50%</span>
+            </label>
+
+            <input
+                id="levelInput"
+                type="range"
+                min="0"
+                max="100"
+                value="50"
+            >
+        </div>
+    </div>
+
+    <script>
+        let dataValue = 50;
+
+        const water = document.getElementById("water");
+        const levelLabel = document.getElementById("levelLabel");
+        const levelInput = document.getElementById("levelInput");
+        const sliderValue = document.getElementById("sliderValue");
+
+        function setWaterLevel(value) {
+            const level = Math.max(0, Math.min(100, Number(value)));
+
+            water.style.setProperty("--water-level", `${level}%`);
+            levelLabel.textContent = `${level}%`;
+            sliderValue.textContent = `${level}%`;
+            levelInput.value = level;
+        }
+
+        levelInput.addEventListener("input", function () {
+            setWaterLevel(this.value);
+        });
+
+        setWaterLevel(dataValue);
+    </script>
+
+</body>
+</html>
