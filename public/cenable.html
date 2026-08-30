@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visual Components Demo</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            padding: 0px;
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        h2 {
+            margin: 10px 0;
+        }
+
+        .controls {
+            margin-bottom: 20px;
+        }
+
+        .component {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            background: #fff;
+        }
+
+        /* Switch */
+        .switch-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 22px;
+        }
+
+        .switch-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .switch-content label {
+            color: #222;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .switch-status {
+            min-width: 70px;
+            color: #2a1a12;
+            font-size: 18px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .rocker-input {
+            position: absolute;
+            width: 0;
+            height: 0;
+            opacity: 0;
+        }
+
+        .rocker-switch {
+            position: relative;
+            width: 70px;
+            height: 120px;
+            cursor: pointer;
+            perspective: 300px;
+        }
+
+        .rocker-lever {
+            position: absolute;
+            inset: 0;
+            border: 2px solid #2a1a12;
+            border-radius: 12px;
+            background: linear-gradient(to bottom, #3d2518, #7a3220 40%, #c44a22 70%, #e05a2b);
+            box-shadow: 0 6px 18px #00000059, inset 0 1px 1px #ffffff26;
+            transition: 0.3s ease;
+            transform: rotateX(12deg);
+        }
+
+        .rocker-input:checked + .rocker-switch .rocker-lever {
+            background: linear-gradient(to bottom, #e05a2b, #c44a22 30%, #7a3220 60%, #3d2518);
+            box-shadow: 0 -4px 14px #00000040, 0 8px 20px #e05a2b33;
+            transform: rotateX(-12deg);
+        }
+
+        .rocker-lever::before,
+        .rocker-lever::after {
+            position: absolute;
+            left: 50%;
+            width: 30px;
+            height: 3px;
+            border-radius: 2px;
+            content: "";
+            transform: translateX(-50%);
+        }
+
+        .rocker-lever::before {
+            top: 6px;
+            background: #ffffff40;
+        }
+
+        .rocker-lever::after {
+            bottom: 6px;
+            background: #ffffff1f;
+        }
+
+        /* Water level */
+        .tank-wrapper {
+            --tank-top: 0cqw;
+            position: relative;
+            container-type: inline-size;
+            width: min(180px, calc(100vw - 24px));
+            margin: 25px 0;
+        }
+
+        .tank {
+            position: relative;
+            width: 90cqw;
+            height: 133.3333cqw;
+            margin: 0 auto;
+            overflow: hidden;
+            border: 2cqw solid #fa4d16;
+            border-radius: 48% 48% 22% 22% / 15% 15% 8% 8%;
+            background: #fff;
+            box-shadow: inset 2.6667cqw 0 #fa4d1614, inset -2.6667cqw 0 #fa4d1614;
+        }
+
+        .water {
+            position: absolute;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            height: var(--water-level, 50%);
+            background: #3586ff;
+            transition: height 0.2s ease-in-out;
+        }
+
+        .waves {
+            position: absolute;
+            top: -10cqw;
+            left: 0;
+            width: 400cqw;
+            height: 266.6667cqw;
+        }
+
+        .wave {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 33.3333cqw;
+            background-image: url("https://uploads.onecompiler.io/44y7xzs48/1788024678290/wave.png");
+            background-repeat: repeat-x;
+            background-size: 100cqw 10cqw;
+        }
+
+        #wave1 {
+            z-index: 1;
+            animation: waveMoveReverse 2s linear infinite;
+        }
+
+        #wave2 {
+            z-index: 3;
+            opacity: 0.45;
+            animation: waveMoveReverse 4s linear infinite;
+        }
+
+        #wave3 {
+            z-index: 2;
+            opacity: 0.35;
+            animation: waveMove 3s linear infinite;
+        }
+
+        #wave4 {
+            z-index: 4;
+            opacity: 0.25;
+            animation: waveMoveReverse 4s linear infinite;
+        }
+
+        @keyframes waveMove {
+            from {
+                transform: translateX(0);
+            }
+
+            to {
+                transform: translateX(25%);
+            }
+        }
+
+        @keyframes waveMoveReverse {
+            from {
+                transform: translateX(-25%);
+            }
+
+            to {
+                transform: translateX(0);
+            }
+        }
+
+        .level-label {
+            position: absolute;
+            inset: 0;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            font-weight: bold;
+            text-shadow: 0 1px 3px #000;
+            pointer-events: none;
+        }
+
+        .tank-controls {
+            width: 90cqw;
+            margin: 15px auto 0;
+            color: #333;
+            text-align: center;
+        }
+
+        .tank-controls label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            accent-color: #fa4d16;
+            cursor: pointer;
+        }
+
+        /* Temperature */
+        .temperature-wrapper {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 30px;
+            min-height: 280px;
+            padding-left: 35px;
+            padding-bottom: 35px;
+        }
+
+        .thermometer {
+            position: relative;
+            width: 70px;
+            height: 260px;
+            border: 4px solid #555;
+            border-radius: 35px 35px 20px 20px;
+            background: #e8e8e8;
+            box-shadow: inset 0 0 8px #0003;
+        }
+
+        .thermometer::after {
+            content: "";
+            position: absolute;
+            bottom: -42px;
+            left: 50%;
+            width: 105px;
+            height: 105px;
+            border: 4px solid #555;
+            border-radius: 50%;
+            background: #e8e8e8;
+            transform: translateX(-50%);
+            z-index: -1;
+        }
+
+        .temperature-tube {
+            position: absolute;
+            bottom: 18px;
+            left: 50%;
+            width: 24px;
+            height: 215px;
+            overflow: hidden;
+            border-radius: 20px;
+            background: #ccc;
+            transform: translateX(-50%);
+        }
+
+        .temperature-fill {
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            height: 50%;
+            background: linear-gradient(to top, #1769ff, #ffcc00, #ff2b16);
+            transition: height 0.25s ease;
+        }
+
+        .temperature-bulb {
+            position: absolute;
+            bottom: -29px;
+            left: 50%;
+            width: 62px;
+            height: 62px;
+            border-radius: 50%;
+            background: #ff4b23;
+            transform: translateX(-50%);
+            box-shadow: 0 2px 8px #0004;
+        }
+
+        .temperature-units {
+            position: absolute;
+            top: 92px;
+            left: 50%;
+            z-index: 5;
+            width: 160px;
+            padding: 7px 10px;
+            border: 2px solid #555;
+            border-radius: 8px;
+            background: #ffffffe6;
+            color: #222;
+            font-size: 13px;
+            font-weight: bold;
+            text-align: center;
+            transform: translateX(-50%);
+            pointer-events: none;
+        }
+
+        .temperature-info {
+            min-width: 250px;
+        }
+
+        .temperature-info h3 {
+            margin-top: 0;
+        }
+
+        .temperature-controls {
+            width: min(320px, 100%);
+        }
+
+        @media (max-width: 420px) {
+            .switch-wrapper {
+                gap: 14px;
+            }
+
+            .switch-status {
+                min-width: 55px;
+                font-size: 16px;
+            }
+
+            .temperature-units {
+                width: 145px;
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <h2>Enable/Disable Visuals</h2>
+
+    <div class="controls">
+        <label>
+            <input type="checkbox" id="toggleSwitch" checked>
+            Show Switch Visual
+        </label>
+        <br>
+
+        <label>
+            <input type="checkbox" id="toggleWater" checked>
+            Show Water Level Visual
+        </label>
+        <br>
+
+        <label>
+            <input type="checkbox" id="toggleTemperature" checked>
+            Show Temperature Visual
+        </label>
+    </div>
+
+    <div id="switchComponent" class="component">
+        <h2>Device Switch</h2>
+
+        <div class="switch-wrapper">
+            <div class="switch-content">
+                <input type="checkbox" id="switch1" class="rocker-input" checked onchange="updateStatus(this)">
+
+                <label class="rocker-switch" for="switch1">
+                    <span class="rocker-lever"></span>
+                </label>
+
+                <label for="switch1">Device switch</label>
+            </div>
+
+            <span id="switchStatus" class="switch-status">ON</span>
+        </div>
+    </div>
+
+    <div id="waterComponent" class="component">
+        <h2>Water Level</h2>
+
+        <div class="tank-wrapper">
+            <div class="tank">
+                <div class="water" id="water">
+                    <div class="waves">
+                        <div class="wave" id="wave1"></div>
+                        <div class="wave" id="wave2"></div>
+                        <div class="wave" id="wave3"></div>
+                        <div class="wave" id="wave4"></div>
+                    </div>
+                </div>
+
+                <div class="level-label" id="levelLabel">50%</div>
+            </div>
+
+            <div class="tank-controls">
+                <label for="levelInput">
+                    Water Level: <span id="sliderValue">50%</span>
+                </label>
+
+                <input id="levelInput" type="range" min="0" max="100" value="50">
+            </div>
+        </div>
+    </div>
+
+    <div id="temperatureComponent" class="component">
+        <h2>Temperature</h2>
+
+        <div class="temperature-wrapper">
+            <div class="thermometer">
+                <div class="temperature-tube">
+                    <div class="temperature-fill" id="temperatureFill"></div>
+                </div>
+
+                <div class="temperature-units">
+                    <span id="celsiusValue">25.00 °C</span>
+                    /
+                    <span id="fahrenheitValue">77.00 °F</span>
+                </div>
+
+                <div class="temperature-bulb"></div>
+            </div>
+
+            <div class="temperature-info">
+                <div class="temperature-controls">
+                    <label for="temperatureInput">
+                        Temperature:
+                        <span id="temperatureSliderValue">25.00 °C</span>
+                    </label>
+
+                    <input id="temperatureInput" type="range" min="-50" max="150" value="25">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const switchComponent = document.getElementById("switchComponent");
+        const waterComponent = document.getElementById("waterComponent");
+        const temperatureComponent = document.getElementById("temperatureComponent");
+
+        document.getElementById("toggleSwitch").addEventListener("change", function () {
+            switchComponent.style.display = this.checked ? "block" : "none";
+        });
+
+        document.getElementById("toggleWater").addEventListener("change", function () {
+            waterComponent.style.display = this.checked ? "block" : "none";
+        });
+
+        document.getElementById("toggleTemperature").addEventListener("change", function () {
+            temperatureComponent.style.display = this.checked ? "block" : "none";
+        });
+
+        function updateStatus(input) {
+            document.getElementById("switchStatus").textContent =
+                input.checked ? "ON" : "OFF";
+        }
+
+        const water = document.getElementById("water");
+        const levelLabel = document.getElementById("levelLabel");
+        const levelInput = document.getElementById("levelInput");
+        const sliderValue = document.getElementById("sliderValue");
+
+        function setWaterLevel(value) {
+            const level = Math.max(0, Math.min(100, Number(value)));
+
+            water.style.setProperty("--water-level", `${level}%`);
+            levelLabel.textContent = `${level}%`;
+            sliderValue.textContent = `${level}%`;
+            levelInput.value = level;
+        }
+
+        levelInput.addEventListener("input", function () {
+            setWaterLevel(this.value);
+        });
+
+        const temperatureInput = document.getElementById("temperatureInput");
+        const temperatureFill = document.getElementById("temperatureFill");
+        const temperatureSliderValue = document.getElementById("temperatureSliderValue");
+        const celsiusValue = document.getElementById("celsiusValue");
+        const fahrenheitValue = document.getElementById("fahrenheitValue");
+
+        function formatTemperature(value, unit) {
+            return `${value.toFixed(2)} ${unit}`;
+        }
+
+        function updateTemperature() {
+            const celsius = Number(temperatureInput.value);
+            const fahrenheit = (celsius * 9 / 5) + 32;
+            const thermometerLevel = ((celsius + 50) / 200) * 100;
+
+            temperatureFill.style.height = `${thermometerLevel}%`;
+            celsiusValue.textContent = formatTemperature(celsius, "°C");
+            fahrenheitValue.textContent = formatTemperature(fahrenheit, "°F");
+            temperatureSliderValue.textContent = formatTemperature(celsius, "°C");
+        }
+
+        temperatureInput.addEventListener("input", updateTemperature);
+
+        setWaterLevel(50);
+        updateTemperature();
+    </script>
+</body>
+
+</html>
