@@ -34,7 +34,8 @@
         .tank-wrapper::before {
             content: "";
             position: absolute;
-            top: var(--tank-top);
+            top: calc(var(--tank-top) + 9px);
+            overflow: visible;
             left: 50%;
             width: 50cqw;
             height: 9.3333cqw;
